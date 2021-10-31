@@ -14,17 +14,24 @@ public class PlaneMove : MonoBehaviour
     public float timer = 0.0f;
     public float rotation;
     public TextMeshProUGUI speedText;
+    public TextMeshProUGUI timerText;
     public ParticleSystem explosion;
     private bool hasCrashed = false;
     public AudioSource crash;
     public AudioSource engine;
+    public AudioSource woosh;
     public GameObject spawnLoc;
     public Vector3 spawnRot;
+    private float gameTimer = 0.0f;
+    private bool isFinished = false;
+
+    public GameObject Wind;
 
     private void Awake()
     {
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
+        
 
         //mouseDelta.x = Mathf.Clamp(mouseDelta.x, -1, 1);
         //mouseDelta.y = Mathf.Clamp(mouseDelta.y, -1, 1);
@@ -34,23 +41,62 @@ public class PlaneMove : MonoBehaviour
 
     void Update()
     {
+        
+
+
         rotation = transform.localRotation.eulerAngles.x;
         if (hasCrashed == false)
         {
             Controls();
         }
         
-        GetSpeed();
+        SpeedToText();
 
-
+        if (speed > 13.0f && speed <= 16.0f)
+        {
+            Wind.transform.localScale = new Vector3(1.0f, 1.0f, 1.0f);
+            Wind.SetActive(true);
+        }
+        else if (speed > 16.0f)
+        {
+            Wind.SetActive(true);
+            Wind.transform.localScale = new Vector3(0.8f, 1.0f, 1.0f);
+        }
+        else if (speed < 11.0f)
+        {
+            Wind.transform.localScale = new Vector3(1.0f, 1.0f, 1.0f);
+            Wind.SetActive(false);
+        }
+        else
+        {
+            Wind.transform.localScale = new Vector3(1.0f, 1.0f, 1.0f);
+            Wind.SetActive(false);
+        }
 
 
     }
 
-    public void GetSpeed()
+    private void LateUpdate()
+    {
+        if (isFinished == false)
+        {
+            gameTimer += Time.deltaTime;
+
+            float output = Mathf.Round(gameTimer * 10.0f) * 0.1f;
+            timerText.text = output.ToString();
+        }
+
+    }
+
+    public void SpeedToText()
     {
         speedText.text = Mathf.RoundToInt(speed).ToString();
         
+    }
+
+    public float GetSpeed()
+    {
+        return speed;
     }
 
     
@@ -125,7 +171,7 @@ public class PlaneMove : MonoBehaviour
         rb.angularVelocity = Vector3.zero;
         speed = 8;
         
-        this.gameObject.transform.rotation = Quaternion.EulerAngles(spawnRot);
+        this.gameObject.transform.rotation = Quaternion.Euler(spawnRot);
         this.gameObject.transform.position = spawnLoc.transform.position;
 
     }
@@ -133,10 +179,17 @@ public class PlaneMove : MonoBehaviour
 
     private IEnumerator OnCollisionEnter(Collision collision)
     {
-        if (speed >= 8 || hasCrashed == true)
+        if (speed >= 8 || hasCrashed == true && collision.gameObject.tag != "boost" && collision.gameObject.tag != "FinishLine")
         {
-            explosion.Play();
-            crash.Play();
+            if (!explosion.isPlaying)
+            {
+                explosion.Play();
+            }
+            if (!crash.isPlaying)
+            {
+                crash.Play();
+            }
+            
             engine.Stop();
 
             rb.useGravity = enabled;
@@ -149,4 +202,22 @@ public class PlaneMove : MonoBehaviour
 
         }
     }
+
+
+
+    private void OnTriggerEnter(Collider other)
+    {
+        if (other.gameObject.tag == "boost")
+        {
+            speed = speed + 3.0f;
+            woosh.Play();
+        }
+
+        else if (other.gameObject.tag == "FinishLine")
+        {
+            // Race finished
+            isFinished = true;
+        }
+    }
+
 }
