@@ -20,10 +20,15 @@ public class PlaneMove : MonoBehaviour
     public AudioSource crash;
     public AudioSource engine;
     public AudioSource woosh;
-    public GameObject spawnLoc;
+    
     public Vector3 spawnRot;
     private float gameTimer = 0.0f;
     private bool isFinished = false;
+
+    //public GameObject world;
+
+
+   // public Vector3 offset = new Vector3();
 
     public GameObject Wind;
 
@@ -41,7 +46,21 @@ public class PlaneMove : MonoBehaviour
 
     void Update()
     {
-        
+
+        //RaycastHit raydata;
+        //if (Physics.Raycast(transform.position, -transform.up, out raydata))
+        //{
+        //    Debug.DrawLine(transform.position, raydata.point, Color.red);
+        //    Debug.DrawRay(raydata.point, raydata.normal * 1000, Color.red);
+
+        //    //offset = raydata.normal;
+        //}
+        //else
+        //{
+        //    //Debug.DrawRay(transform.position, -transform.up * 1000, Color.black);
+        //}
+
+
 
 
         rotation = transform.localRotation.eulerAngles.x;
@@ -88,11 +107,46 @@ public class PlaneMove : MonoBehaviour
 
     }
 
+
+    public void SetTimerText(GameObject go)
+    {
+        TextMeshProUGUI[] joys = go.GetComponentsInChildren<TextMeshProUGUI>();
+        foreach (TextMeshProUGUI joy in joys)
+        {
+            if (joy.name == "Timer")
+                timerText = joy;
+        }
+
+    }
+
     public void SpeedToText()
     {
         speedText.text = Mathf.RoundToInt(speed).ToString();
         
     }
+    public void SetSpeedText(GameObject go)
+    {
+        TextMeshProUGUI[] joys = go.GetComponentsInChildren<TextMeshProUGUI>();
+        foreach (TextMeshProUGUI joy in joys)
+        {
+            if (joy.name == "SpeedText")
+                speedText = joy;
+        }
+        
+    }
+
+    public void SetWind(GameObject go)
+    {
+        Image[] joys = go.GetComponentsInChildren<Image>();
+        foreach (Image joy in joys)
+        {
+            if (joy.name == "WindPanel")
+                Wind = joy.gameObject;
+        }
+
+    }
+    
+
 
     public float GetSpeed()
     {
@@ -103,7 +157,10 @@ public class PlaneMove : MonoBehaviour
 
     public void Controls()
     {
-        transform.Translate(Vector3.forward * Time.deltaTime * speed);
+        transform.Translate((Vector3.forward)* Time.deltaTime * speed);
+
+        //transform.localRotation = Quaternion.EulerRotation(-offset.x, 0.0f, 0.0f);
+        //transform.RotateAround(world.transform.position, new Vector3(offset.x * 10, 0, 0),  Time.deltaTime);
 
         if (Input.GetKey(KeyCode.A))
         {
@@ -162,6 +219,21 @@ public class PlaneMove : MonoBehaviour
         }
     }
 
+    public void MobileControls()
+    {
+        if (Input.touchCount > 0)
+        {
+            for (int i = 0; i <= Input.touchCount; i++)
+            {
+                
+                Vector3 touchPosition = Camera.main.ScreenToWorldPoint(Input.touches[i].position);
+            }
+
+            
+
+        }
+    }
+
     public void Respawn()
     {
         hasCrashed = false;
@@ -172,7 +244,7 @@ public class PlaneMove : MonoBehaviour
         speed = 8;
         
         this.gameObject.transform.rotation = Quaternion.Euler(spawnRot);
-        this.gameObject.transform.position = spawnLoc.transform.position;
+        this.gameObject.transform.position = new Vector3(0.0f, 0.0f, 878.5f);
 
     }
 
@@ -217,6 +289,7 @@ public class PlaneMove : MonoBehaviour
         {
             // Race finished
             isFinished = true;
+            
         }
     }
 

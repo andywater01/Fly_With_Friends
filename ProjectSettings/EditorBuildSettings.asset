@@ -6,6 +6,15 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
+    path: Assets/Scenes/Main Menu.unity
+    guid: f81fd79687414b44a8e61a5004982680
+  - enabled: 1
+    path: Assets/Scenes/Loading.unity
+    guid: 30f312dc74b9019428c7b88eefbdeac7
+  - enabled: 1
+    path: Assets/Scenes/Menu.unity
+    guid: 0bfb5967a65b1c14a97873f37ebcd32e
+  - enabled: 1
     path: Assets/Scenes/Grass_Level_1.unity
     guid: 9fc0d4010bbf28b4594072e72b8655ab
   m_configObjects: {}
